@@ -1,0 +1,24 @@
+services:
+  app:
+    build: .
+    image: my-node-app
+    ports:
+      - "8095:3000"
+    environment:
+      REDIS_HOST: redis
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      retries: 10
+
+volumes:
+  redis-data:
